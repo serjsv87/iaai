@@ -1,6 +1,11 @@
 (function( $ ) {
 	'use strict';
-
+	console.log('here')
+	$( ".loaderDiv" ).hide( "slow");
+	// With the element initially shown, we can hide it slowly:
+	$( "#iaaiclick" ).click(function() {
+	  $( ".loaderDiv" ).show( "slow");
+	});
 	/**
 	 * All of the code for your admin-facing JavaScript source
 	 * should reside in this file.

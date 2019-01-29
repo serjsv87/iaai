@@ -18,8 +18,8 @@ class Parser
 	}
 
 	public function run_Parser() {
-		$this->getTax();
-		exit;
+		//$this->getTax();
+		//exit;
 		include 'phpQuery-onefile.php';
 		$url = 'https://abetter.bid/ru/car-finder/type-automobiles';
 		$lines = file($this->fileLots);
@@ -37,75 +37,21 @@ class Parser
 		}
 	}
 
-	private function getTax() {
-		$post_id_7 = get_post( 3562  );
-		//$post_id_7 = get_post( 2723 );
-		$title = $post_id_7->post_title;
-		echo "post:$title";
-//$metas = get_post_meta( $post_id_7->ID, 'images' );
-		$metas = get_post_meta( $post_id_7->ID);
-echo '<pre>'; //html тег для более наглядного вывода ( вместо \n в каждой строке)
-//print_r(get_object_vars($metas));// print_r выводит массив
-
-	print_r($metas);
-
-		if ( function_exists( 'add_theme_support' ) ) {
-			echo " exist ";
-    			add_theme_support( 'post-thumbnails' ); // @todo check is it needed?
-     		}
-     		else {
-     			echo " nooooo exist ";
-     		}
-
-if ( has_post_thumbnail($post_id_7)) { 
-echo "issssssss post thumbnail for post:".$post_id_7->ID;
-//echo get_the_post_thumbnail($post_id_7->ID, 'thumbnail' );
-
-			echo get_the_post_thumbnail( $post_id_7->ID, 'thumbnail'); ?>
-			<h1><?php echo get_the_title($post_id_7); ?></h1>
-			<?php echo get_the_excerpt($post_id_7);
-
-	?>
-
-   <a href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>" >
-   <?php the_post_thumbnail(); ?>
-   </a>
- <?php } 
- else {
- 	echo "no post thumbnail for post:".$post_id_7->ID;
- }
-
-
-    if ($autoshowroom_images = get_field('images',$post_id_7->ID)) {
-        foreach ($autoshowroom_images as $image) { ?>
-            <li data-src="<?php echo esc_url($image['url']); ?>">
-                <a><img src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['title']); ?>"/></a>
-            </li>
-        <?php }
-    }
-
-	}
-
 	private function parser($url, $lot, $start) {
 		$page   = $this->getCurl($url);
 		$doc    = phpQuery::newDocument($page);
-
-		$this->getPhoto($href);
-		exit;
 		$hentry = $doc->find('.carlist');
 		$isLot  = false;
 		foreach ($hentry as $el) {
 			$elem_pq = pq($el); 
 			$hr      = $elem_pq->find('a');
 			$href    = $hr->attr('href');
-			//$this->getPhoto($href);
 			if(strpos($href, trim($lot))) {
-				//$this->getPhoto($href);
 				$propss = $this->getUrl($href);
 /*				foreach ($propss as $value) {
 					echo $value['name'].': '.$value['val'] . "<br>";
 				}*/
-				
+				//getPhoto($href);
 				if ($this->saveLot($propss)) {
 					$isLot = true;
 					break;					
@@ -126,55 +72,6 @@ echo "issssssss post thumbnail for post:".$post_id_7->ID;
 			}
 		}
 		return $isLot;
-	}
-
-	private function getPhoto($href) {
-		echo "here";
-
-
-
-		//$url        ="https://abetter.bid".$href;
-$url        ="https://www.autobidmaster.com/en/carfinder-online-auto-auctions/lot/51070708/COPART_2010_SUBARU_IMPREZA_2_CERT_OF_TITLE-SALVAGE_HARTFORD_CT/";
-		$doc        = $this->getCurl($url);
-		$details    = $doc->find('.large-images img');
-		$i=0;
-		foreach ($details as $el) {
-			$i++;
-			$elem_pq = pq($el);
-			$hr      = $elem_pq->find('img');
-			$src    = $elem_pq->attr('src');
-			$img = file_get_contents($src);
-			$overrides = [ 'test_form' => false ];
-
-			// когда мы во фронте
-			require_once ABSPATH . 'wp-admin/includes/media.php';
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-			require_once ABSPATH . 'wp-admin/includes/image.php';
-
-			//$url = 'http://s.w.org/style/images/wp-header-logo.png';
-			//$post_id = 3061;
-			$post_id = 3563;
-			$desc = "Логотип WordPress";
-
-			$img_tag = media_sideload_image( $src, $post_id, $desc );
-
-			if( is_wp_error($img_tag) ){
-				echo $img_tag->get_error_message();
-			}
-			else {
-				// добавлено 
-				echo "  img_tag:$img_tag<br>";
-			}			
-			//$movefile  = wp_handle_upload( $img, $overrides );
-			//$movefile  = wp_handle_upload( file_put_contents('slimg'.$i.'.jpg', $img), $overrides );
-			//$k=file_put_contents('slimg'.$i.'.jpg', $img);
-			//echo "k=$k  $i src:$src<br>";
-			echo "$i src:$src<br>";
-		}
-//echo '<pre>'; //html тег для более наглядного вывода ( вместо \n в каждой строке)
-//print_r(get_object_vars($details));// print_r выводит массив
-
-//	print_r($car_dealer);		
 	}
 
 	private function getUrl($href) {
